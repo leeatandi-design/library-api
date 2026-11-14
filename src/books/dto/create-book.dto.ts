@@ -1,0 +1,8 @@
+export class CreateBookDto {
+  title: string;
+  author: string;
+  isbn: string;
+  publishedYear: number;
+  genreId: string;
+  copiesAvailable?: number;
+}
