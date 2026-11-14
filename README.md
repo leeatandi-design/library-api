@@ -142,3 +142,5 @@ In short: `Genre` is a real entity with its own identity, not just a label on a 
 ### Prisma vs a Document Database
 
 One thing that felt different: In a document DB like MongoDB, I would have embedded the genre object or an array of reviews directly inside the Book document. In Prisma, I had to think in relations and foreign keys first, and let Prisma generate the joins. It is more upfront work, but queries are more predictable and the schema prevents bad data.
+#   - l i b r a r y - a p i  
+ 
