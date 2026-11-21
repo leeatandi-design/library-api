@@ -1,0 +1,27 @@
+import { Module } from '@nestjs/common';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { PrismaModule } from './prisma/prisma.module';
+import { BooksModule } from './books/books.module';
+import { GenresModule } from './genres/genres.module';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
+import { BorrowRequestsModule } from './borrow-requests/borrow-requests.module';
+import { BookingsModule } from './bookings/bookings.module';
+
+@Module({
+  imports: [
+    ThrottlerModule.forRoot([{ ttl: 60000, limit: 10 }]),
+    PrismaModule,
+    BooksModule,
+    GenresModule,
+    AuthModule,
+    UsersModule,
+    BorrowRequestsModule,
+    BookingsModule,
+  ],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
