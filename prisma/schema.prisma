@@ -36,7 +36,7 @@ model Book {
   author          String
   isbn            String   @unique
   publishedYear   Int
-  copiesAvailable Int      @default(1)
+  totalCopies     Int      @default(1)
   genreId         String
   genre           Genre    @relation(fields: [genreId], references: [id])
   reviews         Review[]
