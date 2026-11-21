@@ -9,63 +9,49 @@ import { LoginDto } from './dto/login.dto';
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly jwtService: JwtService,
+    private readonly jwt: JwtService,
   ) {}
 
-  async register(registerDto: RegisterDto) {
+  async register(dto: RegisterDto) {
     const existing = await this.prisma.user.findUnique({
-      where: { email: registerDto.email },
+      where: { email: dto.email },
     });
 
     if (existing) {
       throw new ConflictException('Email already registered');
     }
 
-    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+    const hashed = await bcrypt.hash(dto.password, 10);
 
     const user = await this.prisma.user.create({
       data: {
-        email: registerDto.email,
-        name: registerDto.name,
-        password: hashedPassword,
-        role: registerDto.role,
+        email: dto.email,
+        name: dto.name || dto.email.split('@')[0],
+        password: hashed,
+        role: dto.role || 'PATRON',
       },
     });
 
-    const payload = { sub: user.id, email: user.email, role: user.role };
-    const accessToken = this.jwtService.sign(payload);
-
-    return {
-      accessToken,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-      },
-    };
+    return this.issueToken(user);
   }
 
-  async login(loginDto: LoginDto) {
+  async login(dto: LoginDto) {
     const user = await this.prisma.user.findUnique({
-      where: { email: loginDto.email },
+      where: { email: dto.email },
     });
 
-    if (!user) {
+    if (!user || !(await bcrypt.compare(dto.password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const passwordValid = await bcrypt.compare(loginDto.password, user.password);
+    return this.issueToken(user);
+  }
 
-    if (!passwordValid) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    const payload = { sub: user.id, email: user.email, role: user.role };
-    const accessToken = this.jwtService.sign(payload);
-
+  private issueToken(user: { id: any; role: string; email?: string; name?: string }) {
+    const token = this.jwt.sign({ sub: user.id, role: user.role });
     return {
-      accessToken,
+      access_token: token,
+      accessToken: token, // supports both naming conventions
       user: {
         id: user.id,
         email: user.email,

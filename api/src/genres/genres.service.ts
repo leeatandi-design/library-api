@@ -7,45 +7,38 @@ import { UpdateGenreDto } from './dto/update-genre.dto';
 export class GenresService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(createGenreDto: CreateGenreDto) {
-    return this.prisma.genre.create({
-      data: { name: createGenreDto.name },
-    });
-  }
-
   findAll() {
-    return this.prisma.genre.findMany({
-      include: { books: true },
-    });
+    return this.prisma.genre.findMany();
   }
 
-  async findOne(id: string) {
+  async findOne(id: string | number) {
     const genre = await this.prisma.genre.findUnique({
-      where: { id },
-      include: { books: true },
+      where: { id: String(id) },
     });
-
     if (!genre) {
-      throw new NotFoundException(`Genre with ID "${id}" not found`);
+      throw new NotFoundException(`Genre ${id} not found`);
     }
-
     return genre;
   }
 
-  async update(id: string, updateGenreDto: UpdateGenreDto) {
-    await this.findOne(id);
-
-    return this.prisma.genre.update({
-      where: { id },
-      data: updateGenreDto,
+  create(dto: CreateGenreDto) {
+    return this.prisma.genre.create({
+      data: dto,
     });
   }
 
-  async remove(id: string) {
+  async update(id: string | number, dto: UpdateGenreDto) {
     await this.findOne(id);
+    return this.prisma.genre.update({
+      where: { id: String(id) },
+      data: dto,
+    });
+  }
 
+  async remove(id: string | number) {
+    await this.findOne(id);
     return this.prisma.genre.delete({
-      where: { id },
+      where: { id: String(id) },
     });
   }
 }

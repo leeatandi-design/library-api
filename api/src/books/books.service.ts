@@ -2,57 +2,45 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
-import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class BooksService {
   constructor(private readonly prisma: PrismaService) {}
 
-  findAll(query: {
-    genreId?: string;
-    search?: string;
-    page?: number;
-    limit?: number;
-  }) {
-    const { genreId, search, page = 1, limit = 10 } = query;
+  findAll(genreId?: string, search?: string, page: number = 1, limit: number = 20) {
+    const where: any = {};
 
-    const where: Prisma.BookWhereInput = {};
-
-    if (genreId) {
-      where.genreId = genreId;
+    if (genreId !== undefined && genreId !== '') {
+      where.genreId = String(genreId);
     }
 
-    if (search) {
+    if (search && search.trim() !== '') {
       where.OR = [
         { title: { contains: search, mode: 'insensitive' } },
         { author: { contains: search, mode: 'insensitive' } },
       ];
     }
 
-    const skip = (page - 1) * limit;
-
     return this.prisma.book.findMany({
       where,
-      skip,
-      take: limit,
       include: {
         genre: true,
-        reviews: true,
       },
+      skip: (page - 1) * limit,
+      take: Number(limit),
     });
   }
 
-  async findOne(id: string) {
+  async findOne(id: string | number) {
     const book = await this.prisma.book.findUnique({
-      where: { id },
+      where: { id: String(id) },
       include: {
         genre: true,
-        reviews: true,
       },
     });
 
     if (!book) {
-      throw new NotFoundException(`Book with ID "${id}" not found`);
+      throw new NotFoundException(`Book ${id} not found`);
     }
 
     return book;
@@ -64,9 +52,9 @@ export class BooksService {
         title: createBookDto.title,
         author: createBookDto.author,
         isbn: createBookDto.isbn,
-        publishedYear: createBookDto.publishedYear,
-        totalCopies: createBookDto.totalCopies,
-        genreId: createBookDto.genreId,
+        publishedYear: createBookDto.publishedYear ?? new Date().getFullYear(),
+        totalCopies: createBookDto.totalCopies ?? 1,
+        genreId: String(createBookDto.genreId),
       },
       include: {
         genre: true,
@@ -74,23 +62,28 @@ export class BooksService {
     });
   }
 
-  async update(id: string, updateBookDto: UpdateBookDto) {
+  async update(id: string | number, updateBookDto: UpdateBookDto) {
     await this.findOne(id);
 
+    const data: any = Object.assign({}, updateBookDto);
+    if (data.genreId !== undefined) {
+      data.genreId = String(data.genreId);
+    }
+
     return this.prisma.book.update({
-      where: { id },
-      data: updateBookDto,
+      where: { id: String(id) },
+      data,
       include: {
         genre: true,
       },
     });
   }
 
-  async remove(id: string) {
+  async remove(id: string | number) {
     await this.findOne(id);
 
     return this.prisma.book.delete({
-      where: { id },
+      where: { id: String(id) },
     });
   }
 }

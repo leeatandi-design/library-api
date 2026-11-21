@@ -27,12 +27,12 @@ export class BooksController {
     @Query('page') page?: string,
     @Query('limit') limit?: string,
   ) {
-    return this.booksService.findAll({
+    return this.booksService.findAll(
       genreId,
       search,
-      page: page ? parseInt(page, 10) : undefined,
-      limit: limit ? parseInt(limit, 10) : undefined,
-    });
+      Number(page) || 1,
+      Number(limit) || 20,
+    );
   }
 
   @Get(':id')
