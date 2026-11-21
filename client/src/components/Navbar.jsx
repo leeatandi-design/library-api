@@ -2,14 +2,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useReadingList } from '../context/ReadingListContext';
 
 function Navbar() {
-  const { count } = useReadingList();
+  const { readingList } = useReadingList();
   const navigate = useNavigate();
-  const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
-  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  const token = localStorage.getItem('token');
+  const count = Array.isArray(readingList) ? readingList.length : 0;
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    localStorage.removeItem('accessToken');
     localStorage.removeItem('user');
     navigate('/login');
   };
@@ -23,18 +22,15 @@ function Navbar() {
         </Link>
         <nav className="nav-links">
           <Link to="/" className="nav-link">Catalog</Link>
-          <Link to="/book-space" className="nav-link">Book a Space</Link>
+          <Link to="/booking" className="nav-link">Book a Space</Link>
           <span className="reading-list-badge">
             📖 Reading List: <strong>{count}</strong>
           </span>
 
           {token ? (
-            <div className="auth-menu">
-              <span className="user-greeting">Hi, {user?.name || 'Reader'}</span>
-              <button onClick={handleLogout} className="logout-btn">
-                Logout
-              </button>
-            </div>
+            <button onClick={handleLogout} className="logout-btn">
+              Logout
+            </button>
           ) : (
             <div className="auth-links">
               <Link to="/login" className="nav-link">Login</Link>

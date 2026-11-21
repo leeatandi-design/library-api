@@ -1,44 +1,20 @@
 import { useState } from 'react';
 
 function SpaceBookingPage() {
-  const [space, setSpace] = useState('');
-  const [date, setDate] = useState('');
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
+  const [form, setForm] = useState({
+    spaceId: '',
+    date: '',
+    startTime: '',
+    endTime: '',
+  });
   const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState(null);
 
-  const spaces = [
-    { id: 'quiet-study-1', name: 'Quiet Study Room A (1-2 persons)' },
-    { id: 'quiet-study-2', name: 'Quiet Study Room B (1-2 persons)' },
-    { id: 'group-collab-1', name: 'Group Collaboration Hub (4-8 persons)' },
-    { id: 'conference-room', name: 'Conference & Presentation Hall (10-20 persons)' },
-    { id: 'multimedia-lab', name: 'Multimedia & Podcast Studio' },
-  ];
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setError(null);
-
-    if (!space || !date || !startTime || !endTime) {
-      setError('Please fill in all booking details.');
-      return;
-    }
-
-    if (startTime >= endTime) {
-      setError('End time must be later than start time.');
-      return;
-    }
-
     setSubmitted(true);
-  };
-
-  const handleReset = () => {
-    setSpace('');
-    setDate('');
-    setStartTime('');
-    setEndTime('');
-    setSubmitted(false);
   };
 
   return (
@@ -46,7 +22,7 @@ function SpaceBookingPage() {
       <div className="booking-card">
         <h2>Reserve a Study Space</h2>
         <p className="booking-subtitle">
-          Book quiet pods, discussion rooms, or multimedia spaces.
+          Book quiet study rooms, discussion pods, or conference halls.
         </p>
 
         {submitted ? (
@@ -54,72 +30,75 @@ function SpaceBookingPage() {
             <span className="success-icon">🎉</span>
             <h3>Booking Confirmed!</h3>
             <p>
-              Your reservation for <strong>{spaces.find((s) => s.id === space)?.name}</strong> on{' '}
-              <strong>{date}</strong> from <strong>{startTime}</strong> to <strong>{endTime}</strong> has been secured.
+              Your reservation for study space on {form.date} from {form.startTime} to {form.endTime} has been received.
             </p>
-            <button onClick={handleReset} className="auth-submit-btn" style={{ marginTop: '1.5rem' }}>
+            <button
+              onClick={() => setSubmitted(false)}
+              className="auth-submit-btn"
+              style={{ marginTop: '1.5rem' }}
+            >
               Book Another Space
             </button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="booking-form">
-            {error && <div className="auth-error-alert">{error}</div>}
-
             <div className="form-group">
-              <label htmlFor="space-select">Select Space</label>
+              <label htmlFor="spaceId">Study Space</label>
               <select
-                id="space-select"
+                id="spaceId"
+                name="spaceId"
+                value={form.spaceId}
+                onChange={handleChange}
                 required
-                value={space}
-                onChange={(e) => setSpace(e.target.value)}
               >
-                <option value="">-- Choose a Study Space --</option>
-                {spaces.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                  </option>
-                ))}
+                <option value="">Select a study space</option>
+                <option value="1">Room A (4 seats)</option>
+                <option value="2">Room B (8 seats)</option>
+                <option value="3">Quiet Pod 1 (1 seat)</option>
+                <option value="4">Multimedia Lab (6 seats)</option>
               </select>
             </div>
 
             <div className="form-group">
-              <label htmlFor="booking-date">Date</label>
+              <label htmlFor="date">Date</label>
               <input
-                id="booking-date"
+                id="date"
                 type="date"
+                name="date"
+                value={form.date}
+                onChange={handleChange}
                 required
-                value={date}
-                min={new Date().toISOString().split('T')[0]}
-                onChange={(e) => setDate(e.target.value)}
               />
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="start-time">Start Time</label>
+                <label htmlFor="startTime">Start Time</label>
                 <input
-                  id="start-time"
+                  id="startTime"
                   type="time"
+                  name="startTime"
+                  value={form.startTime}
+                  onChange={handleChange}
                   required
-                  value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
                 />
               </div>
 
               <div className="form-group">
-                <label htmlFor="end-time">End Time</label>
+                <label htmlFor="endTime">End Time</label>
                 <input
-                  id="end-time"
+                  id="endTime"
                   type="time"
+                  name="endTime"
+                  value={form.endTime}
+                  onChange={handleChange}
                   required
-                  value={endTime}
-                  onChange={(e) => setEndTime(e.target.value)}
                 />
               </div>
             </div>
 
             <button type="submit" className="auth-submit-btn">
-              Confirm Reservation
+              Request Booking
             </button>
           </form>
         )}
