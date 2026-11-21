@@ -1,8 +1,12 @@
 import { Link } from 'react-router-dom';
+import { useReadingList } from '../context/ReadingListContext';
 
 function BookCard({ book }) {
+  const { items, addBook, removeBook } = useReadingList();
   const genreName = book.genre?.name || 'General';
   const availableCopies = book.totalCopies ?? book.copiesAvailable ?? 0;
+
+  const isInList = items.some((item) => item.id === book.id);
 
   return (
     <div className="book-card">
@@ -25,9 +29,18 @@ function BookCard({ book }) {
       </div>
 
       <div className="book-card-footer">
-        <Link to={`/books/${book.id}`} className="view-detail-btn">
-          View Details &rarr;
-        </Link>
+        <div className="card-actions">
+          <Link to={`/books/${book.id}`} className="view-detail-btn">
+            View Details &rarr;
+          </Link>
+          <button
+            type="button"
+            className={`reading-list-btn ${isInList ? 'in-list' : ''}`}
+            onClick={() => (isInList ? removeBook(book.id) : addBook(book))}
+          >
+            {isInList ? '✓ In List' : '+ Add to List'}
+          </button>
+        </div>
       </div>
     </div>
   );
