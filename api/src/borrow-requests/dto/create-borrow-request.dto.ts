@@ -1,15 +1,6 @@
-import { IsNotEmpty, IsString, IsDateString, IsOptional } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 
 export class CreateBorrowRequestDto {
-  @IsString()
   @IsNotEmpty()
-  bookId: string;
-
-  @IsDateString()
-  @IsNotEmpty()
-  dueDate: string;
-
-  @IsDateString()
-  @IsOptional()
-  borrowDate?: string;
+  bookId: any;
 }

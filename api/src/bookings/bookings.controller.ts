@@ -22,7 +22,8 @@ export class BookingsController {
   @Post()
   create(@Req() req: Request, @Body() createDto: CreateBookingDto) {
     const user = (req as any).user;
-    return this.bookingsService.create(user.id, createDto);
+    const userId = user?.userId || user?.id || user?.sub;
+    return this.bookingsService.create(userId, createDto);
   }
 
   @Get()
@@ -32,8 +33,7 @@ export class BookingsController {
     @Query('userId') userId?: string,
   ) {
     const user = (req as any).user;
-    // Patrons only see their own bookings; librarians can inspect all bookings (Admin route)
-    const targetUserId = user.role === 'LIBRARIAN' ? userId : user.id;
+    const targetUserId = user.role === 'LIBRARIAN' ? userId : (user?.userId || user?.id);
     return this.bookingsService.findAll({ spaceId, userId: targetUserId });
   }
 
@@ -45,6 +45,7 @@ export class BookingsController {
   @Patch(':id/cancel')
   cancel(@Req() req: Request, @Param('id') id: string) {
     const user = (req as any).user;
-    return this.bookingsService.cancel(id, user.id, user.role === 'LIBRARIAN');
+    const userId = user?.userId || user?.id;
+    return this.bookingsService.cancel(id, userId, user.role === 'LIBRARIAN');
   }
 }

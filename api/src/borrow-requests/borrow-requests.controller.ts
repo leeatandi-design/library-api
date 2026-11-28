@@ -11,48 +11,44 @@ import {
 } from '@nestjs/common';
 import { BorrowRequestsService } from './borrow-requests.service';
 import { CreateBorrowRequestDto } from './dto/create-borrow-request.dto';
-import { UpdateBorrowRequestDto } from './dto/update-borrow-request.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
-import { BorrowStatus } from '@prisma/client';
-import type { Request } from 'express';
 
 @Controller('borrow-requests')
-@UseGuards(JwtAuthGuard)
 export class BorrowRequestsController {
-  constructor(private readonly borrowRequestsService: BorrowRequestsService) {}
+  constructor(private service: BorrowRequestsService) {}
 
   @Post()
-  create(@Req() req: Request, @Body() createDto: CreateBorrowRequestDto) {
-    const user = (req as any).user;
-    return this.borrowRequestsService.create(user.id, createDto);
+  @UseGuards(JwtAuthGuard)
+  create(@Req() req: any, @Body() dto: CreateBorrowRequestDto) {
+    const userId = req.user?.userId || req.user?.id || req.user?.sub;
+    return this.service.create(userId, dto);
   }
 
   @Get()
-  findAll(
-    @Req() req: Request,
-    @Query('status') status?: BorrowStatus,
-    @Query('userId') userId?: string,
-  ) {
-    const user = (req as any).user;
-    // Patrons only see their own requests; librarians can see all or filter by user
-    const targetUserId = user.role === 'LIBRARIAN' ? userId : user.id;
-    return this.borrowRequestsService.findAll({ status, userId: targetUserId });
+  @UseGuards(JwtAuthGuard)
+  findAll(@Req() req: any, @Query('status') status?: any, @Query('userId') userId?: any) {
+    const user = req.user;
+    const targetUserId = user?.role === 'LIBRARIAN' ? userId : (user?.userId || user?.id);
+    return this.service.findAll({ status, userId: targetUserId });
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
   findOne(@Param('id') id: string) {
-    return this.borrowRequestsService.findOne(id);
+    return this.service.findOne(id);
   }
 
   @Patch(':id')
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('LIBRARIAN')
-  update(
+  updateStatus(
     @Param('id') id: string,
-    @Body() updateDto: UpdateBorrowRequestDto,
+    @Body('status') statusPayload?: string,
+    @Body() fullBody?: any,
   ) {
-    return this.borrowRequestsService.update(id, updateDto);
+    const status = statusPayload || fullBody?.status;
+    return this.service.updateStatus(id, status);
   }
 }
