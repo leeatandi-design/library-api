@@ -62,7 +62,7 @@
               "script": {
                 "exec": [
                   "var jsonData = pm.response.json();",
-                  "pm.collectionVariables.set('token', jsonData.accessToken);"
+                  "pm.collectionVariables.set('token', jsonData.accessToken || jsonData.access_token);"
                 ],
                 "type": "text/javascript"
               }

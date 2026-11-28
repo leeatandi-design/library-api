@@ -11,9 +11,9 @@ export class GenresService {
     return this.prisma.genre.findMany();
   }
 
-  async findOne(id: string | number) {
+  async findOne(id: any) {
     const genre = await this.prisma.genre.findUnique({
-      where: { id: String(id) },
+      where: { id: String(id) as any },
     });
     if (!genre) {
       throw new NotFoundException(`Genre ${id} not found`);
@@ -27,18 +27,16 @@ export class GenresService {
     });
   }
 
-  async update(id: string | number, dto: UpdateGenreDto) {
-    await this.findOne(id);
+  update(id: any, dto: UpdateGenreDto) {
     return this.prisma.genre.update({
-      where: { id: String(id) },
+      where: { id: String(id) as any },
       data: dto,
     });
   }
 
-  async remove(id: string | number) {
-    await this.findOne(id);
+  remove(id: any) {
     return this.prisma.genre.delete({
-      where: { id: String(id) },
+      where: { id: String(id) as any },
     });
   }
 }

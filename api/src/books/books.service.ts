@@ -31,9 +31,9 @@ export class BooksService {
     });
   }
 
-  async findOne(id: string | number) {
+  async findOne(id: any) {
     const book = await this.prisma.book.findUnique({
-      where: { id: String(id) },
+      where: { id: String(id) as any },
       include: {
         genre: true,
       },
@@ -62,16 +62,14 @@ export class BooksService {
     });
   }
 
-  async update(id: string | number, updateBookDto: UpdateBookDto) {
-    await this.findOne(id);
-
+  update(id: any, updateBookDto: UpdateBookDto) {
     const data: any = Object.assign({}, updateBookDto);
     if (data.genreId !== undefined) {
       data.genreId = String(data.genreId);
     }
 
     return this.prisma.book.update({
-      where: { id: String(id) },
+      where: { id: String(id) as any },
       data,
       include: {
         genre: true,
@@ -79,11 +77,9 @@ export class BooksService {
     });
   }
 
-  async remove(id: string | number) {
-    await this.findOne(id);
-
+  remove(id: any) {
     return this.prisma.book.delete({
-      where: { id: String(id) },
+      where: { id: String(id) as any },
     });
   }
 }

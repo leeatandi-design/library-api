@@ -26,7 +26,7 @@ export class GenresController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.genresService.findOne(id);
+    return this.genresService.findOne(isNaN(Number(id)) ? id : Number(id));
   }
 
   @Post()
@@ -40,13 +40,16 @@ export class GenresController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('LIBRARIAN')
   update(@Param('id') id: string, @Body() updateGenreDto: UpdateGenreDto) {
-    return this.genresService.update(id, updateGenreDto);
+    return this.genresService.update(
+      isNaN(Number(id)) ? id : Number(id),
+      updateGenreDto,
+    );
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('LIBRARIAN')
   remove(@Param('id') id: string) {
-    return this.genresService.remove(id);
+    return this.genresService.remove(isNaN(Number(id)) ? id : Number(id));
   }
 }

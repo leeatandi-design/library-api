@@ -37,7 +37,7 @@ export class BooksController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.booksService.findOne(id);
+    return this.booksService.findOne(isNaN(Number(id)) ? id : Number(id));
   }
 
   @Post()
@@ -51,13 +51,16 @@ export class BooksController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('LIBRARIAN')
   update(@Param('id') id: string, @Body() updateBookDto: UpdateBookDto) {
-    return this.booksService.update(id, updateBookDto);
+    return this.booksService.update(
+      isNaN(Number(id)) ? id : Number(id),
+      updateBookDto,
+    );
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('LIBRARIAN')
   remove(@Param('id') id: string) {
-    return this.booksService.remove(id);
+    return this.booksService.remove(isNaN(Number(id)) ? id : Number(id));
   }
 }
