@@ -9,7 +9,7 @@ export class BorrowRequestsService {
 
   async create(userId: any, dto: CreateBorrowRequestDto) {
     const book = await this.prisma.book.findUnique({
-      where: { id: String(dto.bookId) },
+      where: { id: String(dto.bookId) as any },
     });
     if (!book) throw new NotFoundException('Book not found');
 
@@ -19,8 +19,10 @@ export class BorrowRequestsService {
       data: {
         userId: String(userId),
         bookId: book.id,
+        bookTitle: book.title,
+        bookAuthor: book.author,
         dueDate,
-      },
+      } as any,
       include: {
         book: true,
       },
@@ -60,16 +62,19 @@ export class BorrowRequestsService {
   }
 
   async updateStatus(id: any, status: string) {
-    const request = await this.findOne(id);
+    const request = await this.prisma.borrowRequest.findUnique({
+      where: { id: String(id) as any },
+    });
+    if (!request) throw new NotFoundException('Request not found');
 
     const data: any = { status };
     if (status === 'RETURNED') {
       const now = new Date();
       data.returnDate = now;
-      data.fineAmount = calculateFine(request.dueDate, now);
+      data.fineAmount = request.dueDate ? calculateFine(request.dueDate, now) : 0;
     }
     return this.prisma.borrowRequest.update({
-      where: { id: String(id) },
+      where: { id: String(id) as any },
       data,
       include: { book: true },
     });

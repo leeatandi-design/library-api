@@ -12,10 +12,14 @@ enum Role {
 }
 
 enum BorrowStatus {
+  REQUESTED
   PENDING
   APPROVED
-  REJECTED
+  BORROWED
   RETURNED
+  OVERDUE
+  CANCELLED
+  REJECTED
 }
 
 enum BookingStatus {
@@ -74,18 +78,21 @@ model Review {
 }
 
 model BorrowRequest {
-  id         String       @id @default(cuid())
-  userId     String
-  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  bookId     String
-  book       Book         @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  status     BorrowStatus @default(PENDING)
-  borrowDate DateTime     @default(now())
-  dueDate    DateTime
-  returnDate DateTime?
-  fineAmount Float        @default(0.0)
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
+  id          String       @id @default(cuid())
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookId      String
+  book        Book         @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  bookTitle   String?
+  bookAuthor  String?
+  status      BorrowStatus @default(REQUESTED)
+  requestDate DateTime     @default(now())
+  borrowDate  DateTime     @default(now())
+  dueDate     DateTime?
+  returnDate  DateTime?
+  fineAmount  Float        @default(0.0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }
 
 model Space {

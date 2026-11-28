@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { BorrowRequestsModule } from './borrow-requests/borrow-requests.module';
 import { BookingsModule } from './bookings/bookings.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { BookingsModule } from './bookings/bookings.module';
     UsersModule,
     BorrowRequestsModule,
     BookingsModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],

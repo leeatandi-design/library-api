@@ -7,16 +7,13 @@ export class BookingsService {
   constructor(private prisma: PrismaService) {}
 
   async create(userId: any, dto: CreateBookingDto) {
-    const spaceId = String(dto.spaceId);
-
-    // Run conflict check via Prisma findFirst
     const conflict = await this.prisma.booking.findFirst({
       where: {
-        spaceId,
-        date: new Date(dto.date),
-        status: 'CONFIRMED',
-        startTime: { lt: new Date(dto.endTime) },
-        endTime: { gt: new Date(dto.startTime) },
+        spaceId: dto.spaceId as any,
+        date: dto.date as any,
+        status: 'CONFIRMED' as any,
+        startTime: { lt: dto.endTime } as any,
+        endTime: { gt: dto.startTime } as any,
       },
     });
 
@@ -26,16 +23,9 @@ export class BookingsService {
 
     return this.prisma.booking.create({
       data: {
-        userId: String(userId),
-        spaceId,
-        date: new Date(dto.date),
-        startTime: new Date(dto.startTime),
-        endTime: new Date(dto.endTime),
-        status: 'CONFIRMED',
-      },
-      include: {
-        space: true,
-      },
+        ...dto,
+        userId: userId as any,
+      } as any,
     });
   }
 

@@ -49,6 +49,9 @@ export class BorrowRequestsController {
     @Body() fullBody?: any,
   ) {
     const status = statusPayload || fullBody?.status;
-    return this.service.updateStatus(id, status);
+    return this.service.updateStatus(
+      isNaN(Number(id)) ? id : Number(id),
+      status,
+    );
   }
 }
