@@ -7,18 +7,14 @@ function BookGrid({ genreId, search }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+  const apiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '');
 
   useEffect(() => {
     setLoading(true);
     setError(null);
 
-    const params = {};
-    if (genreId) params.genreId = genreId;
-    if (search) params.search = search;
-
     axios
-      .get(`${apiUrl}/books`, { params })
+      .get(`${apiUrl}/books`, { params: { genreId, search } })
       .then((res) => {
         setBooks(Array.isArray(res.data) ? res.data : []);
       })
