@@ -42,4 +42,5 @@ export function ReadingListProvider({ children }) {
 
 export const useReadingList = () => useContext(ReadingListContext);
 
+export { ReadingListContext, reducer };
 export default ReadingListContext;

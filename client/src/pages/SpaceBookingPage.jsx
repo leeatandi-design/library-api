@@ -107,4 +107,5 @@ function SpaceBookingPage() {
   );
 }
 
+export { SpaceBookingPage as SpaceBookingForm };
 export default SpaceBookingPage;

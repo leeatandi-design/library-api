@@ -11,10 +11,8 @@ function LoginPage() {
     e.preventDefault();
     setError(null);
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/auth/login`,
-        formData,
-      );
+      const apiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '');
+      const res = await axios.post(`${apiUrl}/auth/login`, formData);
       const token = res.data.access_token || res.data.accessToken;
       localStorage.setItem('token', token);
       if (res.data.user) {
